@@ -17,6 +17,7 @@ from sqlalchemy.types import NullType
 from collections import OrderedDict
 
 from plenario.models import ShapeMetadata
+from plenario.api.common import ConditionBuilder
 
 
 class ParamValidator(object):
@@ -187,6 +188,34 @@ class ParamValidator(object):
     They take a string and return a tuple of (expected_return_type, error_message)
     where error_message is non-None only when the transformation could not produce an object of the expected type.
 '''
+
+def setup_condition_builder(dataset_name, params):
+    try:
+        if 'shape' in params:
+            shape = params['shape']
+        else:
+            shape = None
+        builder = ConditionBuilder(dataset_name, shape)
+    except NoSuchTableError:
+        return bad_request("Cannot find dataset named {}".format(dataset_name))
+
+    builder\
+        .set_general_condition('obs_date__ge',
+                      date_validator,
+                      datetime.now() - timedelta(days=90))\
+        .set_general_condition('obs_date__le', date_validator, datetime.now())\
+        .set_general_condition('location_geom__within', geom_validator, None)\
+        .set_general_condition('offset', int_validator, 0)\
+        .set_general_condition('data_type',
+                      make_format_validator(['json', 'csv', 'geojson']),
+                      'json')\
+        .set_general_condition('date__time_of_day_ge', time_of_day_validator, 0)\
+        .set_general_condition('date__time_of_day_le', time_of_day_validator, 23)
+
+    '''create another validator to check if shape dataset is in meta_shape, then return
+    the actual table object for that shape if it is present'''
+
+    return builder
 
 def setup_detail_validator(dataset_name, params):
     
@@ -441,6 +470,21 @@ def form_csv_detail_response(to_remove, validator, rows):
     csv_resp = [rows[0].keys()] + [row.values() for row in rows]
     resp = make_response(make_csv(csv_resp), 200)
     dname = validator.dataset.name #dataset_name
+    filedate = datetime.now().strftime('%Y-%m-%d')
+    resp.headers['Content-Type'] = 'text/csv'
+    resp.headers['Content-Disposition'] = 'attachment; filename=%s_%s.csv' % (dname, filedate)
+    return resp
+
+def form_csv_detail_response_with_builder(to_remove, builder, rows):
+    to_remove.append('geom')
+    remove_columns_from_dict(rows, to_remove)
+
+    # Column headers from arbitrary row,
+    # then the values from all the others
+    csv_resp = [rows[0].keys()] + [row.values() for row in rows]
+    resp = make_response(make_csv(csv_resp), 200)
+    dname = builder.point_dataset.name #dataset_name
+    
     filedate = datetime.now().strftime('%Y-%m-%d')
     resp.headers['Content-Type'] = 'text/csv'
     resp.headers['Content-Disposition'] = 'attachment; filename=%s_%s.csv' % (dname, filedate)

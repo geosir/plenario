@@ -16,6 +16,9 @@ from plenario.api.point import ParamValidator, setup_detail_validator,\
 from collections import OrderedDict
 from sqlalchemy import func
 
+from plenario.api.common import ConditionBuilder
+from plenario.api.point import setup_condition_builder
+
 #if columns are specified by the user's shape query, check that the column
 #names include only valid characters (ie alphanumeric characters and underscores)
 def validate_sql_string(sql_string):
@@ -113,43 +116,59 @@ def get_all_shape_datasets():
     resp.headers['Content-Type'] = 'application/json'
     return resp
 
-
 def aggregate_point_data(point_dataset_name, polygon_dataset_name):
 
     params = request.args.copy()
+
     # Doesn't this override the path-derived parameter with a query parameter?
     # Do we want that?
     if not params.get('shape'):
         # form_detail_query expects to get info about a shape dataset this way.
         params['shape'] = polygon_dataset_name
 
-    validator = setup_detail_validator(point_dataset_name, params)
+    validator = setup_condition_builder(point_dataset_name, params)
+    #validator = setup_detail_validator(point_dataset_name, params)
 
-    err = validator.validate(params)
+    err = validator.make_conditions_from_params(params)
     if err:
         return bad_request(err)
 
+    '''
+    point_dataset_filters = params.get("point_dataset_filters")
+    shape_dataset_filters = params.get("shape_dataset_filters")
+    
+    if point_dataset_filters:
+        point_filter_dict = json.loads(point_dataset_filters)
+
+    if shape_dataset_filters:
+        shape_filter_dict = json.loads(shape_dataset_filters)
+
+    '''
+
+    # condition_tree_parse(x_dataset_filters) should return a sqlalchemy condition to the validator that can be 'AND''d in with q.filter?
+
     # Apply standard filters to point dataset
     # And join each point to the containing shape
-    q = form_detail_sql_query(validator, True)
-    q = q.add_columns(func.count(validator.dataset.c.hash))
+    # q = form_detail_sql_query(validator, True)
+    q = validator.form_query_from_conditions(aggregate_points=True)
+    q = q.add_columns(func.count(validator.point_dataset.c.hash))
 
     # Page in RESPONSE_LIMIT chunks
     # This seems contradictory. Don't we want one row per shape, no matter what?
-    offset = validator.vals['offset']
+    offset = validator.param_dict['offset']
     q = q.limit(RESPONSE_LIMIT)
     if offset > 0:
         q = q.offset(offset)
 
     res_cols = []
-    for col in validator.cols:
+    for col in validator.shape_cols:
         if col[:len(polygon_dataset_name)] == polygon_dataset_name:
             res_cols.append(col[len(polygon_dataset_name)+1:])
     res_cols.append('count')
 
     rows = [OrderedDict(zip(res_cols, res)) for res in q.all()]
     if params.get('data_type') == 'csv':
-        resp = form_csv_detail_response(['hash', 'ogc_fid'], validator, rows)
+        resp = form_csv_detail_response_with_builder(['hash', 'ogc_fid'], validator, rows)
     else:
         resp = form_geojson_detail_response(['hash', 'ogc_fid'], validator, rows)
 

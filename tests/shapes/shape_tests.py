@@ -217,6 +217,29 @@ class ShapeTests(BasePlenarioTest):
             self.assertGreaterEqual(neighborhood['properties']['count'], 1)
             #print neighborhood['properties']['sec_neigh'], neighborhood['properties']['count']
 
+    def test_aggregate_point_data_with_landmarks_neighborhoods_architect_time_in_tree(self):
+        condition_dict = {}
+        condition_dict["op"] = "STMT"
+        stmt_dict = {}
+        stmt_dict["col_name"] = "architect"
+        stmt_dict["val"] = "Frank Lloyd Wright"
+        condition_dict["val"] = stmt_dict
+        print condition_dict
+        condition_dict_str = json.dumps(condition_dict)
+        print condition_dict_str
+        url = '/v1/api/shapes/chicago_neighborhoods/landmarks/?obs_date__ge=1900-09-22&obs_date__le=2013-10-1&point_dataset_filters=' + condition_dict_str
+        response = self.app.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.data)
+        neighborhoods = data['features']
+        self.assertEqual(len(neighborhoods), 6)
+        
+        for neighborhood in neighborhoods:
+            self.assertGreaterEqual(neighborhood['properties']['count'], 1)
+            #print neighborhood['properties']['sec_neigh'], neighborhood['properties']['count']
+
+
     def test_filter_point_data_with_landmarks_neighborhoods_and_bounding_box(self):
         rect_path = os.path.join(FIXTURE_PATH, 'loop_rectangle.json')
         with open(rect_path, 'r') as rect_json:
