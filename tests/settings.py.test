@@ -2,8 +2,8 @@ PLENARIO_SENTRY_URL = None
 CELERY_SENTRY_URL = None
 DATA_DIR = '/tmp'
 
-DB_USER = 'postgres'
-DB_PASSWORD = ''
+DB_USER = 'plenario'
+DB_PASSWORD = 'password'
 DB_HOST = 'localhost'
 DB_PORT = '5432'
 DB_NAME = 'plenario_test'
