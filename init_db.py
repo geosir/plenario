@@ -46,17 +46,20 @@ def init_meta():
     Base.metadata.create_all(bind=app_engine)
 
 def init_user():
-    print 'creating default user %s' % DEFAULT_USER['name']
-    if session.query(plenario.models.User).count() > 0:
-        print 'Users already exist. Skipping this step.'
-        return
-    user = plenario.models.User(**DEFAULT_USER)
-    session.add(user)
-    try:
-        session.commit()
-    except Exception as e:
-        session.rollback()
-        print "Problem while creating default user: ", e
+    if DEFAULT_USER['name']:
+        print 'Creating default user %s' % DEFAULT_USER['name']
+        if session.query(plenario.models.User).count() > 0:
+            print 'Users already exist. Skipping this step.'
+            return
+        user = plenario.models.User(**DEFAULT_USER)
+        session.add(user)
+        try:
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            print "Problem while creating default user: ", e
+    else:
+        print 'No default user specified. Skipping this step.'
 
 
 def init_weather():
