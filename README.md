@@ -1,3 +1,6 @@
+THIS IS A FORK OF THE ORIGINAL PLENARIO REPOSITORY FOR THE PURPOSES OF TESTING DEPLOY AUTOMATION.
+Check out the original repo! [UrbanCCD-UChicago/plenario](https://github.com/UrbanCCD-UChicago/plenario).
+
 [![Code Climate](https://codeclimate.com/github/UrbanCCD-UChicago/plenario/badges/gpa.svg)](https://codeclimate.com/github/UrbanCCD-UChicago/plenario)
 
 # Plenar.io

@@ -6,16 +6,16 @@ PLENARIO_SENTRY_URL = get('PLENARIO_SENTRY_URL', None)
 CELERY_SENTRY_URL = get('CELERY_SENTRY_URL', None)
 DATA_DIR = '/tmp'
 
-DB_USER = get('DB_USER', 'plenario')
-DB_PASSWORD = get('DB_PASSWORD', 'plenario-testy')
-DB_HOST = get('DB_HOST', 'testy-silicon-db.c6r1g0x3odle.us-east-1.rds.amazonaws.com')
+DB_USER = get('DB_USER', 'postgres')
+DB_PASSWORD = get('DB_PASSWORD', 'password')
+DB_HOST = get('DB_HOST', 'localhost')
 DB_PORT = get('DB_PORT', '5432')
-DB_NAME = get('DB_NAME', 'plenario')
+DB_NAME = get('DB_NAME', 'plenario_test')
 
 DATABASE_CONN = 'postgresql://{}:{}@{}:{}/{}'.\
     format(DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
 
-REDIS_HOST = get('REDIS_HOST', 'test-sillicon-carep.eucixb.ng.0001.use1.cache.amazonaws.com')
+REDIS_HOST = get('REDIS_HOST', 'localhost')
 
 # See: https://pythonhosted.org/Flask-Cache/#configuring-flask-cache
 # for config options
@@ -25,16 +25,12 @@ CACHE_CONFIG = {
     'CACHE_KEY_PREFIX': get('CACHE_KEY_PREFIX', 'plenario_app')
 }
 
-# Load a default admin if we're running locally.
-if get('DEBUG'):
-    DEFAULT_USER = {
-        'name': 'plenario_user',
-        'email': 'youremail@example.com',
-        'password': 'your password'
+# Load a default admin
+DEFAULT_USER = {
+    'name': get('DEFAULT_USER_NAME'),
+    'email': get('DEFAULT_USER_EMAIL'),
+    'password': get('DEFAULT_USER_PASSWORD')
 }
-else:
-    DEFAULT_USER = {}
-
 
 AWS_ACCESS_KEY = get('AWS_ACCESS_KEY', '')
 AWS_SECRET_KEY = get('AWS_SECRET_KEY', '')
