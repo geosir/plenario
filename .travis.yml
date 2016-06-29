@@ -14,7 +14,8 @@ install:
 - pip install celery
 - celery -A plenario.celery_app worker --loglevel=info &
 - sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'password';"
-- sudo -u postgres psql -c "CREATE EXTENSION postgis;"
+- sudo -u postgres psql -c "CREATE DATABASE plenario_test;"
+- sudo -u postgres psql -c "CREATE EXTENSION postgis;" plenario_test
 - pip install -r requirements.txt
 - python init_db.py
 script:
