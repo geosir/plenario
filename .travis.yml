@@ -2,7 +2,7 @@ language: python
 python:
 - '2.7'
 services:
-- postgresql
+- postgresql: "9.4"
 - redis-server
 sudo: required
 cache: 
