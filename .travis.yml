@@ -18,8 +18,8 @@ install:
 - sudo apt-get update -qq
 - sudo apt-get -y install gdal-bin postgis
 - celery -A plenario.celery_app worker --loglevel=info &
-- sudo -u postgres -c "psql -c 'ALTER USER postgres WITH PASSWORD password;'"
-- sudo -u postgres -c "psql -c 'CREATE EXTENSION postgis;'"
+- sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'password';"
+- sudo -u postgres psql -c "CREATE EXTENSION postgis;"
 - python init_db.py
 script:
 - echo "Hah! This is a dummy test."
