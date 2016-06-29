@@ -131,6 +131,7 @@ class PointAPITests(BasePlenarioTest):
         multipolygon = get_escaped_geojson('loop_and_near_southeast.json')
         url = 'v1/api/detail/?dataset_name=flu_shot_clinics&obs_date__ge=2013-01-01&obs_date__le=2013-12-31&location_geom__within=' + multipolygon
         resp = self.app.get(url)
+        print resp;
         response_data = json.loads(resp.data)
         self.assertEqual(response_data['meta']['total'], 11)
 

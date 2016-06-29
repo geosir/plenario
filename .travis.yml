@@ -22,7 +22,7 @@ install:
 - python init_db.py
 script:
 - echo "Hah! This is a dummy test."
-- python -m unittest tests.point.api_tests
+- python -m unittest tests.points.api_tests
 #- python -m unittest tests.shape.api_tests
 deploy:
   - provider: elasticbeanstalk
