@@ -14,7 +14,7 @@ install:
 - sudo pip install celery
 - sudo add-apt-repository ppa:ubuntugis/ppa -y
 - sudo apt-get update
-- sudo apt-get -y install gdal postgis postgresql-9.5-postgis-2.2
+- sudo apt-get -y install gdal-bin postgis postgresql-9.5-postgis-2.2
 - celery -A plenario.celery_app worker --loglevel=info &
 - sudo -u postgres -c "psql -c 'ALTER USER postgres WITH PASSWORD password;'"
 - sudo -u postgres -c "psql -c 'CREATE EXTENSION postgis;'"
