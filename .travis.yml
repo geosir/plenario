@@ -20,12 +20,9 @@ install:
 - sudo -u postgres psql -c "CREATE EXTENSION postgis;" plenario_test
 - pip install -r requirements.txt
 - python init_db.py
-- python runserver.py &
 script:
 - echo "Hah! This is a dummy test."
-- curl localhost:5000/v1/api/datasets
-#- python -m unittest tests.points.api_tests
-#- python -m unittest tests.shape.api_tests
+- python -m unittest tests.points.api_tests
 deploy:
   - provider: elasticbeanstalk
     access_key_id:
