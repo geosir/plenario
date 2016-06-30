@@ -22,9 +22,7 @@ install:
 - celery -A plenario.celery_app worker --loglevel=info &
 - python init_db.py
 script:
-- echo "Hah! This is a dummy test."
-- ogr2ogr --version
-- python -m unittest tests.points.api_tests
+- nosetests
 deploy:
   - provider: elasticbeanstalk
     access_key_id:
