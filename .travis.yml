@@ -21,8 +21,6 @@ install:
 - sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'password';"
 - sudo -u postgres psql -c "CREATE DATABASE plenario_test;"
 - sudo -u postgres psql -c "CREATE EXTENSION postgis;" plenario_test
-- echo "Giving some time for Celery to start up..."
-- sleep 3
 - python init_db.py
 script:
 - nosetests tests/points/ tests/shapes/ tests/submission/ -v
